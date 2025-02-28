@@ -5,18 +5,17 @@ const generateToken = require("../Config/generateToken");
 
 const loginController = handler(async (req, res) => {
   const { name, password } = req.body;
+  console.log(name, password);
   const user = await userModel.findOne({ name });
   if (user && (await user.matchPassword(password))) {
-
-    const imageBase64 = user.image ? user.image.toString('base64') : null;
+    const imageBase64 = user.image ? user.image.toString("base64") : null;
     const response = {
       _id: user._id,
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
-      image : imageBase64,
+      image: imageBase64,
       token: generateToken(user._id),
-      
     };
     res.json(response);
   } else {
@@ -57,7 +56,7 @@ const registerController = handler(async (req, res) => {
         name,
         email,
         password,
-        image :image.buffer,
+        image: image.buffer,
       });
     } else {
       user = await userModel.create({ name, email, password });
@@ -66,6 +65,10 @@ const registerController = handler(async (req, res) => {
     if (user) {
       res.status(201).json({
         token: generateToken(user._id),
+        _id: user._id,
+        name,
+        email,
+        image,
       });
     } else {
       res.status(400).json({ error: "Registration error" });
@@ -92,4 +95,8 @@ const fetchAllUsersController = handler(async (req, res) => {
   res.send(users);
 });
 
-module.exports = { registerController, loginController , fetchAllUsersController};
+module.exports = {
+  registerController,
+  loginController,
+  fetchAllUsersController,
+};

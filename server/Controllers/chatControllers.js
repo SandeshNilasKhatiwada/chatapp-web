@@ -50,7 +50,7 @@ const fetchChats = handler(async (req, res) => {
       .populate("users", "-password")
       .populate("groupAdmin", "-password")
       .populate("latestMessage")
-      .sort({ updateAt: -1 })
+      .sort({ updatedAt: -1 })
       .then(async (results) => {
         results = await User.populate(results, {
           path: "latestMessage.sender",
@@ -109,7 +109,7 @@ const groupExit = handler(async (req, res) => {
     },
     {
       new: true,
-    }
+    },
   )
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
@@ -130,7 +130,7 @@ const addSelfGroup = handler(async (req, res) => {
     },
     {
       new: true,
-    }
+    },
   )
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
@@ -143,6 +143,7 @@ const addSelfGroup = handler(async (req, res) => {
 });
 const addMemberToGroup = handler(async (req, res) => {
   const { groupId, usersToAdd } = req.body;
+  console.log("add member: ", req.body);
 
   if (
     !groupId ||
@@ -157,7 +158,7 @@ const addMemberToGroup = handler(async (req, res) => {
     const updatedGroup = await Chat.findByIdAndUpdate(
       groupId,
       { $addToSet: { users: { $each: usersToAdd } } }, // Using $addToSet and $each to ensure uniqueness
-      { new: true }
+      { new: true },
     )
       .populate("users", "-password")
       .populate("groupAdmin", "-password");
@@ -182,7 +183,7 @@ const getUsersInGroup = handler(async (req, res) => {
   try {
     const group = await Chat.findById(groupId).populate(
       "users",
-      "name _id image"
+      "name _id image",
     );
 
     if (!group) {
